@@ -28,18 +28,19 @@ def records_generator(records, index, type):
             if 'NULL' not in document['parseError']:
                 logging.info('{} record has parse error. Skipping.'.format(doc_id))
                 continue
-            logging.info('{} record are marked to be sent to Elasticsearch.'.format(doc_id))
             name = document['name']['S']
             brand = document['brand']['S']
-            yield {
+            url = document['url']['S']
+            es_doc = {
                 "_index": index,
                 "_type": type,
-                "doc": {
-                    'url': document['url']['S'],
-                    'store': document['store']['S'],
-                    'name': name,
-                    'normalized_name': '{} {}'.format(brand, name) if name.find(brand) == -1 else name,
-                    'price': document['price']['N'],
-                    'currency': document['currency']['S']
-                }
+                "_id": url,
+                'url': document['url']['S'],
+                'store': document['store']['S'],
+                'name': name,
+                'normalized_name': '{} {}'.format(brand, name) if name.find(brand) == -1 else name,
+                'price': document['price']['N'],
+                'currency': document['currency']['S']
             }
+            logging.info('{} record marked to be sent to Elasticsearch.'.format(str(es_doc)))
+            yield es_doc
