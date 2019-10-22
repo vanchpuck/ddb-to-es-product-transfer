@@ -25,6 +25,9 @@ event = {
                             "store": {
                                 "S": "test_store"
                             },
+                            "brand": {
+                                "S": "test_brand"
+                            },
                             "name": {
                                 "S": "product_1"
                             },
@@ -58,6 +61,9 @@ event = {
                             },
                             "store": {
                                 "S": "test_store"
+                            },
+                            "brand": {
+                                "S": "test_brand"
                             },
                             "name": {
                                 "S": "product_2"
@@ -93,8 +99,11 @@ event = {
                             "store": {
                                 "S": "test_store"
                             },
+                            "brand": {
+                                "S": "test_brand"
+                            },
                             "name": {
-                                "S": "product_3"
+                                "S": "test_brand - product_3"
                             },
                             "price": {
                                 "N": 30.99
@@ -126,6 +135,9 @@ event = {
                             },
                             "store": {
                                 "S": "test_store"
+                            },
+                            "brand": {
+                                "S": "test_brand"
                             },
                             "name": {
                                 "S": "product_4"

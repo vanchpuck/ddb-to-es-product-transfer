@@ -29,13 +29,16 @@ def records_generator(records, index, type):
                 logging.info('{} record has parse error. Skipping.'.format(doc_id))
                 continue
             logging.info('{} record are marked to be sent to Elasticsearch.'.format(doc_id))
+            name = document['name']['S']
+            brand = document['brand']['S']
             yield {
                 "_index": index,
                 "_type": type,
                 "doc": {
                     'url': document['url']['S'],
                     'store': document['store']['S'],
-                    'name': document['name']['S'],
+                    'name': name,
+                    'normalized_name': '{} {}'.format(brand, name) if name.find(brand) == -1 else name,
                     'price': document['price']['N'],
                     'currency': document['currency']['S']
                 }

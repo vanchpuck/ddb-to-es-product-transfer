@@ -2,3 +2,4 @@
 *.iml
 package/
 *.zip
+test/__pycache__
