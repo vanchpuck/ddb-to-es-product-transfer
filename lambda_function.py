@@ -23,8 +23,12 @@ def lambda_handler(event, context):
 def records_generator(records, index, type):
     for record in records:
         doc_id = record['dynamodb']['Keys']['url']['S']
-        if record["eventName"] == "INSERT":
-            document = record['dynamodb']['NewImage']['document']['M']
+        if record["eventName"] in ["INSERT", "MODIFY"]:
+            new_image = record['dynamodb']['NewImage']
+            if 'fetchError' in new_image:
+                logging.info('{} record has fetch error. Skipping.'.format(doc_id))
+                continue
+            document = new_image['document']['M']
             if 'NULL' not in document['parseError']:
                 logging.info('{} record has parse error. Skipping.'.format(doc_id))
                 continue

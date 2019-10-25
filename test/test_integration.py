@@ -1,10 +1,16 @@
 import unittest
 from lambda_function import lambda_handler
 import os
+from elasticsearch import Elasticsearch
+from time import sleep
 
-os.environ["ES_HOST"] = "http://localhost:9200"
-os.environ["ES_INDEX"] = "gear"
-os.environ["ES_TYPE"] = "product"
+ELASTIC_HOST = "http://localhost:9200"
+INDEX = "gear"
+DOC_TYPE = "product"
+
+os.environ["ES_HOST"] = ELASTIC_HOST
+os.environ["ES_INDEX"] = INDEX
+os.environ["ES_TYPE"] = DOC_TYPE
 
 event = {
     "Records": [
@@ -155,13 +161,50 @@ event = {
                     }
                 }
             }
+        },
+        {
+            "eventName": "INSERT",
+            "dynamodb": {
+                "Keys": {
+                    "url": {
+                        "S": "http://test.com/product_5"
+                    }
+                },
+                "NewImage": {
+                    'fetchError': {'S': 'java.util.concurrent.TimeoutException'}
+                }
+            }
         }
     ]
 }
 
 
-class TestIntegration(unittest.TestCase):
-    # For debugging purposes
+def get_es_instance():
+    elasticsearch = Elasticsearch(ELASTIC_HOST, verify_certs=False)
+    for _ in range(20):
+        sleep(1)
+        try:
+            es.cluster.health(wait_for_status='yellow')
+            return elasticsearch
+        except Exception:
+            continue
+    else:
+        raise RuntimeError("Elasticsearch failed to start.")
+
+
+es = get_es_instance()
+
+
+class TestDataTransfer(unittest.TestCase):
+
     def test_indexing(self):
         lambda_handler(event, None)
+        product_1_expected = {'url': 'http://test.com/product_1', 'store': 'test_store', 'name': 'product_1', 'normalized_name': 'test_brand product_1', 'price': 10.99, 'currency': 'USD'}
+        product_3_expected = {'url': 'http://test.com/product_3', 'store': 'test_store', 'name': 'test_brand - product_3', 'normalized_name': 'test_brand - product_3', 'price': 30.99, 'currency': 'USD'}
+        assert(self.get_actual("http://test.com/product_1") == product_1_expected)
+        assert(self.get_actual("http://test.com/product_3") == product_3_expected)
+
+    @staticmethod
+    def get_actual(doc_id):
+        return es.get(index=INDEX, doc_type=DOC_TYPE, id=doc_id)["_source"]
 
