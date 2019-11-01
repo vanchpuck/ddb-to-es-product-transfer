@@ -25,8 +25,8 @@ def records_generator(records, index, type):
         doc_id = record['dynamodb']['Keys']['url']['S']
         if record["eventName"] in ["INSERT", "MODIFY"]:
             new_image = record['dynamodb']['NewImage']
-            if 'fetchError' in new_image:
-                logging.info('{} record has fetch error. Skipping.'.format(doc_id))
+            if 'document' not in new_image:
+                logging.info('{} record does not contain the document field. Skipping.'.format(doc_id))
                 continue
             document = new_image['document']['M']
             if 'NULL' not in document['parseError']:

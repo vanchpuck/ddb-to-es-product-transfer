@@ -184,7 +184,7 @@ def get_es_instance():
     for _ in range(20):
         sleep(1)
         try:
-            es.cluster.health(wait_for_status='yellow')
+            elasticsearch.cluster.health(wait_for_status='yellow')
             return elasticsearch
         except Exception:
             continue
