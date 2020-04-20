@@ -3,7 +3,7 @@ version: '3'
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.8.2
-    container_name: elasticsearch
+    container_name: elasticsearch-ddb-to-es
     environment:
       - discovery.type=single-node
     ulimits:

@@ -40,8 +40,14 @@ event = {
                             "price": {
                                 "N": 10.99
                             },
+                            "oldPrice": {
+                                "N": 12.99
+                            },
                             "currency": {
                                 "S": "USD"
+                            },
+                            "imageUrl": {
+                                "S": "http://test.com/image_1.jpg"
                             },
                             "parseError": {
                                 "NULL": True
@@ -80,6 +86,9 @@ event = {
                             "currency": {
                                 "S": "USD"
                             },
+                            "imageUrl": {
+                                "S": "http://test.com/image_2.jpg"
+                            },
                             "parseError": {
                                 "S": "Some error"
                             }
@@ -116,6 +125,9 @@ event = {
                             },
                             "currency": {
                                 "S": "USD"
+                            },
+                            "imageUrl": {
+                                "S": "http://test.com/image_3.jpg"
                             },
                             "parseError": {
                                 "NULL": True
@@ -184,9 +196,10 @@ def get_es_instance():
     for _ in range(20):
         sleep(1)
         try:
-            es.cluster.health(wait_for_status='yellow')
+            elasticsearch.cluster.health(wait_for_status='yellow')
             return elasticsearch
-        except Exception:
+        except Exception as err:
+            print(err)
             continue
     else:
         raise RuntimeError("Elasticsearch failed to start.")
@@ -199,8 +212,8 @@ class TestDataTransfer(unittest.TestCase):
 
     def test_indexing(self):
         lambda_handler(event, None)
-        product_1_expected = {'url': 'http://test.com/product_1', 'store': 'test_store', 'name': 'product_1', 'normalized_name': 'test_brand product_1', 'price': 10.99, 'currency': 'USD'}
-        product_3_expected = {'url': 'http://test.com/product_3', 'store': 'test_store', 'name': 'test_brand - product_3', 'normalized_name': 'test_brand - product_3', 'price': 30.99, 'currency': 'USD'}
+        product_1_expected = {'url': 'http://test.com/product_1', 'store': 'test_store', 'name': 'product_1', 'normalizedName': 'test_brand product_1', 'price': 10.99, 'oldPrice': 12.99, 'currency': 'USD', 'imageUrl': 'http://test.com/image_1.jpg'}
+        product_3_expected = {'url': 'http://test.com/product_3', 'store': 'test_store', 'name': 'test_brand - product_3', 'normalizedName': 'test_brand - product_3', 'price': 30.99, 'currency': 'USD', 'imageUrl': 'http://test.com/image_3.jpg'}
         assert(self.get_actual("http://test.com/product_1") == product_1_expected)
         assert(self.get_actual("http://test.com/product_3") == product_3_expected)
 
