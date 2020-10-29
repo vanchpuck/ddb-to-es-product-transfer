@@ -2,8 +2,13 @@ import logging
 import os
 from elasticsearch import helpers
 from elasticsearch import Elasticsearch
+from classification import Classifier
 
 logging.getLogger().setLevel(logging.INFO)
+
+
+MODEL_DATA_BUCKET = "org.gear-scanner.data"
+CLASSIFIER = Classifier(MODEL_DATA_BUCKET)
 
 
 def lambda_handler(event, context):
@@ -42,7 +47,8 @@ def records_generator(records, index, type):
                 'url': document['url']['S'],
                 'store': document['store']['S'],
                 'name': name,
-                'normalizedName': '{} {}'.format(brand, name) if name.find(brand) == -1 else name,
+                # 'normalizedName': '{} {}'.format(brand, name) if name.find(brand) == -1 else name,
+                'originalName': CLASSIFIER.classify(brand, name),
                 'price': document['price']['N'],
                 'currency': document['currency']['S'],
                 'imageUrl': document['imageUrl']['S'],

@@ -1,0 +1,14 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+  build:
+    commands:
+      - pip install --target . -r requirements.txt
+      - aws cloudformation package --template-file dev-template.yml --s3-bucket org.gear-scanner.build --s3-prefix ddb-to-es-transfer --output-template-file outputtemplate.yml
+artifacts:
+  type: zip
+  files:
+    - dev-template.yml
+    - outputtemplate.yml

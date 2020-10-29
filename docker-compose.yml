@@ -2,7 +2,7 @@ version: '3'
 
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.1
     container_name: elasticsearch-ddb-to-es
     environment:
       - discovery.type=single-node
