@@ -44,10 +44,10 @@ Resources:
       Handler: main.lambda_handler
       Runtime: python3.7
       Role: !GetAtt DynamoDBToESTransferExecutionRole.Arn
-      Events:
-        Stream:
-          Type: DynamoDB
-          Properties:
-            Stream: "arn:aws:dynamodb:us-east-2:848625190772:table/GearScannerTest/stream/"
-            BatchSize: 100
-            StartingPosition: TRIM_HORIZON
+  VKBotHandlerSQSMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      Enabled: true
+      EventSourceArn: "arn:aws:dynamodb:us-east-2:848625190772:table/GearScannerTest/stream/"
+      FunctionName: !GetAtt DynamoDBToESTransferDevFunction.Arn
