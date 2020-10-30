@@ -51,3 +51,4 @@ Resources:
       Enabled: true
       EventSourceArn: "arn:aws:dynamodb:us-east-2:848625190772:table/GearScannerTest/stream/2020-04-18T21:02:35.328"
       FunctionName: !GetAtt DynamoDBToESTransferDevFunction.Arn
+      StartingPosition: TRIM_HORIZON
