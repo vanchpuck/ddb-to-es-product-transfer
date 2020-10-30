@@ -36,7 +36,7 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: *
+                Resource: "*"
   DynamoDBToESTransferDevFunction:
     Type: AWS::Serverless::Function
     Properties:
