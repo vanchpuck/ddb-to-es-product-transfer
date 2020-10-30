@@ -37,13 +37,26 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: "*"
+        - PolicyName: allowS3
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                Resource: "arn:aws:s3:::org.gear-scanner.data/*"
   DynamoDBToESTransferDevFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: main.lambda_handler
+      Handler: lambda_function.lambda_handler
       Runtime: python3.7
       Role: !GetAtt DynamoDBToESTransferExecutionRole.Arn
+      Layers:
+        - !Ref SciKitLearnLayer
+        - >-
+          arn:aws:lambda:us-east-2:259788987135:layer:AWSLambda-Python37-SciPy1x:35
   VKBotHandlerSQSMapping:
     Type: AWS::Lambda::EventSourceMapping
     Properties:
@@ -52,3 +65,12 @@ Resources:
       EventSourceArn: "arn:aws:dynamodb:us-east-2:848625190772:table/GearScannerTest/stream/2020-04-18T21:02:35.328"
       FunctionName: !GetAtt DynamoDBToESTransferDevFunction.Arn
       StartingPosition: TRIM_HORIZON
+  SciKitLearnLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: scikit-learn-layer
+      Description: SciKitLearn Dependency for sam app
+      ContentUri: "s3://org.gear-scanner.data/scikitlearn.zip"
+      CompatibleRuntimes:
+        - python3.6
+        - python3.7
