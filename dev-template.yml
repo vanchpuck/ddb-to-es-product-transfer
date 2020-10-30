@@ -48,6 +48,6 @@ Resources:
         Stream:
           Type: DynamoDB
           Properties:
-            Stream: "arn:aws:dynamodb:us-east-2:848625190772:table/products"
+            Stream: "arn:aws:dynamodb:us-east-2:848625190772:table/GearScannerTest/stream/"
             BatchSize: 100
             StartingPosition: TRIM_HORIZON
