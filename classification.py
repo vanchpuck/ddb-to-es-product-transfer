@@ -29,7 +29,7 @@ class Classifier:
     def classify(self, brand, product_name) -> str:
         """Returns the original product name"""
         if brand not in self.models:
-            self.models[brand] = self.read_brand_model_data(brand)
+            self.models[brand] = self.__read_brand_model_data(brand)
         model: BrandModelData = self.models[brand]
         doc_term_matrix = model.vectorizer.transform([product_name]).toarray()
         if not np.sum(doc_term_matrix) > 0:
@@ -42,9 +42,10 @@ class Classifier:
                 return model.brand_products[n_neighbour[1][0][0]]
 
     def __read_brand_model_data(self, brand):
-        model = self.read_dump(self.model_bucket, "{}/{}/{}".format(self.path_prefix, brand, "model.joblib"))
-        products = list(self.read_lines(self.model_bucket, "{}/{}/{}".format(self.path_prefix, brand, "products.txt")))
-        vectorizer = CountVectorizer(ngram_range=(1, 2), binary=True)
+        model = self.__read_dump(self.model_bucket, "{}/{}/{}".format(self.path_prefix, brand, "model.joblib"))
+        products = list(self.__read_lines(self.model_bucket, "{}/{}/{}".format(self.path_prefix, brand, "products.txt")))
+        vocabulary = set(itertools.chain.from_iterable([sub.split() for sub in products]))
+        vectorizer = CountVectorizer(ngram_range=(1, 2), binary=True, vocabulary=vocabulary)
         return BrandModelData(products, vectorizer, model)
 
     def __read_lines(self, bucket, key):
