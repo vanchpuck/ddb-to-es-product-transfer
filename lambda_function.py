@@ -38,7 +38,7 @@ def records_generator(records, index, type):
                 logging.info('{} record has no product information. Skipping.'.format(doc_id))
                 continue
             name = document['name']['S']
-            brand = document['brand']['S']
+            brand = document['brand']['S'].lower()
             url = document['url']['S']
             es_doc = {
                 "_index": index,
@@ -47,8 +47,7 @@ def records_generator(records, index, type):
                 'url': document['url']['S'],
                 'store': document['store']['S'],
                 'name': name,
-                # 'normalizedName': '{} {}'.format(brand, name) if name.find(brand) == -1 else name,
-                'originalName': CLASSIFIER.classify(brand, name),
+                'normalizedName': CLASSIFIER.classify(brand, name),
                 'price': document['price']['N'],
                 'currency': document['currency']['S'],
                 'imageUrl': document['imageUrl']['S'],

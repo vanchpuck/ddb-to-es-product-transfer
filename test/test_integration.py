@@ -32,10 +32,10 @@ event = {
                                 "S": "test_store"
                             },
                             "brand": {
-                                "S": "test_brand"
+                                "S": "petzl"
                             },
                             "name": {
-                                "S": "product_1"
+                                "S": "lynx"
                             },
                             "price": {
                                 "N": 10.99
@@ -75,10 +75,10 @@ event = {
                                 "S": "test_store"
                             },
                             "brand": {
-                                "S": "test_brand"
+                                "S": "petzl"
                             },
                             "name": {
-                                "S": "product_2"
+                                "S": "sarken"
                             },
                             "price": {
                                 "N": 20.99
@@ -115,10 +115,10 @@ event = {
                                 "S": "test_store"
                             },
                             "brand": {
-                                "S": "test_brand"
+                                "S": "petzl"
                             },
                             "name": {
-                                "S": "test_brand - product_3"
+                                "S": "petzl sarken"
                             },
                             "price": {
                                 "N": 30.99
@@ -155,10 +155,10 @@ event = {
                                 "S": "test_store"
                             },
                             "brand": {
-                                "S": "test_brand"
+                                "S": "petzl"
                             },
                             "name": {
-                                "S": "product_4"
+                                "S": "petzl lynx"
                             },
                             "price": {
                                 "N": 40.99
@@ -210,10 +210,11 @@ es = get_es_instance()
 
 class TestDataTransfer(unittest.TestCase):
 
+    # TODO enable the local model storage
     def test_indexing(self):
         lambda_handler(event, None)
-        product_1_expected = {'url': 'http://test.com/product_1', 'store': 'test_store', 'name': 'product_1', 'normalizedName': 'test_brand product_1', 'price': 10.99, 'oldPrice': 12.99, 'currency': 'USD', 'imageUrl': 'http://test.com/image_1.jpg'}
-        product_3_expected = {'url': 'http://test.com/product_3', 'store': 'test_store', 'name': 'test_brand - product_3', 'normalizedName': 'test_brand - product_3', 'price': 30.99, 'currency': 'USD', 'imageUrl': 'http://test.com/image_3.jpg'}
+        product_1_expected = {'url': 'http://test.com/product_1', 'store': 'test_store', 'name': 'lynx', 'normalizedName': 'lynx', 'price': 10.99, 'oldPrice': 12.99, 'currency': 'USD', 'imageUrl': 'http://test.com/image_1.jpg'}
+        product_3_expected = {'url': 'http://test.com/product_3', 'store': 'test_store', 'name': 'petzl sarken', 'normalizedName': 'sarken', 'price': 30.99, 'currency': 'USD', 'imageUrl': 'http://test.com/image_3.jpg'}
         assert(self.get_actual("http://test.com/product_1") == product_1_expected)
         assert(self.get_actual("http://test.com/product_3") == product_3_expected)
 

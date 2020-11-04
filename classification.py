@@ -4,9 +4,7 @@ from joblib import load
 import logging
 import boto3
 import numpy as np
-import json
 import itertools
-from decimal import Decimal
 
 
 class BrandModelData:
@@ -35,7 +33,7 @@ class Classifier:
         if not np.sum(doc_term_matrix) > 0:
             return product_name
         else:
-            n_neighbour = model.nn_model.kneighbors(doc_term_matrix)
+            n_neighbour: NearestNeighbors = model.nn_model.kneighbors(doc_term_matrix)
             if n_neighbour[0][0][0] == n_neighbour[0][0][2]:
                 return product_name
             else:
