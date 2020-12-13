@@ -162,6 +162,3 @@ class TestUtil(unittest.TestCase):
         print(expected_records[1])
         print(actual_records[1])
         assert expected_records[1] == actual_records[1]
-        # assert expected_records == actual_records
-        # for i in records_generator(self.es, PRODUCT_INDEX, event['Records']):
-        #     print("record: " + str(i))
