@@ -117,8 +117,8 @@ class TestUtil(unittest.TestCase):
                 {"name": "lynx", "brand": "petzl"}
             ]
         }
-        actual_records = list(process_origin(PRODUCT_INDEX, origin_product))
-        expected_records = [{'_index': 'products', '_id': 'lynx', '_op_type': 'create', '_routing': 'lynx', 'name': 'lynx', 'brand': 'petzl'}]
+        actual_records = process_origin(PRODUCT_INDEX, origin_product)
+        expected_records = [{'_index': 'products', '_id': 'petzl lynx', '_op_type': 'create', '_routing': 'lynx', 'name': 'lynx', 'brand': 'petzl', 'normalizedName': 'petzl lynx'}]
         print(expected_records)
         print(actual_records)
         assert actual_records == expected_records

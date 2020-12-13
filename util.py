@@ -83,9 +83,15 @@ def process_product(es: Elasticsearch, index: str, product: dict):
 
 
 def process_origin(index: str, origin_product: dict):
-    return map(lambda origin: {"_index": index, "_id": origin['name'], '_op_type': 'create', '_routing': origin['name'],
-                               'name': origin['name'], 'brand': origin['brand']},
-               origin_product['products'])
+    return [create_origin_record(index, origin) for origin in origin_product['products']]
+
+
+def create_origin_record(index: str, origin: dict):
+    name = origin['name']
+    brand = origin['brand']
+    normalized_name = get_normalized_name(name, brand)
+    return {"_index": index, "_id": normalized_name, '_op_type': 'create', '_routing': name,
+            'name': name, 'normalizedName': normalized_name, 'brand': brand}
 
 
 def records_generator(es, index, records):
@@ -113,7 +119,7 @@ def records_generator(es, index, records):
                         yield origin
                         logging.info('{} record marked to be sent to Elasticsearch.'.format(str(origin)))
                 else:
-                    logging.warning('{} record has unknown product type. Skipping.'.format(doc_id))
+                    logging.warning('{} record has unknown type. Skipping.'.format(doc_id))
 
 
 def get_normalized_name(name: str, brand: str) -> str:
