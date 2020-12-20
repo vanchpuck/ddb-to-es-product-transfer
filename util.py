@@ -109,7 +109,8 @@ def records_generator(es, index, records):
                 if kind == 'product':
                     logging.info('The product record spotted')
                     origin_product_pair = process_product(es, index, data)
-                    yield origin_product_pair.origin
+                    if origin_product_pair.origin is not None:
+                        yield origin_product_pair.origin
                     logging.info('{} record marked to be sent to Elasticsearch.'.format(str(origin_product_pair.origin)))
                     yield origin_product_pair.product
                     logging.info('{} record marked to be sent to Elasticsearch.'.format(str(origin_product_pair.product)))
