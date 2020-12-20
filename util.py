@@ -40,7 +40,6 @@ def find_origin(es: Elasticsearch, index: str, name: str, brand: str) -> str:
 
 def process_product(es: Elasticsearch, index: str, product: dict):
     origin_dict = None
-    product_dict = None
     name = product['name']
     brand = product['brand'].lower()
     url = product['url']
@@ -89,9 +88,10 @@ def process_origin(index: str, origin_product: dict):
 def create_origin_record(index: str, origin: dict):
     name = origin['name']
     brand = origin['brand']
+    image_url = origin['imageUrl']
     normalized_name = get_normalized_name(name, brand)
     return {"_index": index, "_id": normalized_name, '_op_type': 'create', '_routing': name,
-            'name': name, 'normalizedName': normalized_name, 'brand': brand}
+            'name': name, 'normalizedName': normalized_name, 'brand': brand, 'imageUrl': image_url}
 
 
 def records_generator(es, index, records):
