@@ -35,6 +35,37 @@ INDEX_SETTINGS = {
         }
     }
 }
+INDEX_SETTINGS = {
+    "settings": {
+        "index": {
+            "analysis": {
+                "normalizer": {
+                    "use_lowercase": {
+                        "type": "custom",
+                        "filter": ["lowercase"]
+                    }
+                }
+            }
+        }
+    },
+    "mappings": {
+        "properties": {
+            "normalizedName": {
+                "type": "text",
+            },
+            "brand": {
+                "type":  "keyword",
+                "normalizer": "use_lowercase"
+            },
+            "relation": {
+                "type": "join",
+                "relations": {
+                    "origin": "product"
+                }
+            }
+        }
+    }
+}
 
 
 def get_es_instance():
@@ -63,10 +94,11 @@ class TestUtil(unittest.TestCase):
         self.es.indices.delete(index=PRODUCT_INDEX, ignore=[400, 404])
 
     def test_find_origin(self):
-        self.es.index(index=PRODUCT_INDEX, refresh=True, routing="1", id="lynx",
-                      body={"relation": {"name": "origin"}, "origin": "lynx", "brand": "petzl"})
-        res = find_origin(self.es, PRODUCT_INDEX, "lynx", "petzl")
-        assert res == "lynx"
+        self.es.index(index=PRODUCT_INDEX, refresh=True, routing="1", id="grivel G14",
+                      body={"relation": {"name": "origin"}, "name": "G14", "normalizedName": "grivel G14", "brand": "grivel"})
+        actual_origin = find_origin(self.es, PRODUCT_INDEX, "G14", "grivel")
+        print(actual_origin)
+        assert actual_origin == "G14"
 
     def test_product_record_with_origin(self):
         self.es.index(index=PRODUCT_INDEX, refresh=True, routing="1", id="lynx",
@@ -81,9 +113,17 @@ class TestUtil(unittest.TestCase):
             "imageUrl": "http://image.com"
         }
         actual_records = process_product(self.es, PRODUCT_INDEX, product)
-        expected_records = ProductOriginPair(None, {'_index': PRODUCT_INDEX, '_id': 'http://lynx.com', '_routing': 'lynx', 'url': 'http://lynx.com',
-                     'store': 'www.store.com', 'name': 'petzl lynx crampons', 'brand': 'petzl', 'price': 99.9, 'currency': 'USD',
-                     'imageUrl': 'http://image.com', 'relation': {'name': 'product', 'parent': 'lynx'}})
+        expected_records = ProductOriginPair(
+            {
+                '_index': 'products', '_id': 'petzl lynx crampons', '_routing': 'petzl lynx crampons', '_op_type': 'create',
+                'brand': 'petzl', 'name': 'petzl lynx crampons', 'normalizedName': 'petzl lynx crampons', 'relation': {'name': 'origin'}
+            },
+            {
+                '_index': PRODUCT_INDEX, '_id': 'http://lynx.com', '_routing': 'petzl lynx crampons', 'url': 'http://lynx.com',
+                'store': 'www.store.com', 'name': 'petzl lynx crampons', 'brand': 'petzl', 'price': 99.9, 'currency': 'USD',
+                'imageUrl': 'http://image.com', 'relation': {'name': 'product', 'parent': 'petzl lynx crampons'}
+            }
+        )
         print(expected_records)
         print(actual_records)
         assert actual_records == expected_records
@@ -118,7 +158,7 @@ class TestUtil(unittest.TestCase):
             ]
         }
         actual_records = process_origin(PRODUCT_INDEX, origin_product)
-        expected_records = [{'_index': 'products', '_id': 'petzl lynx', '_op_type': 'create', '_routing': 'lynx', 'name': 'lynx', 'brand': 'petzl', 'normalizedName': 'petzl lynx', "imageUrl": "http://image.com"}]
+        expected_records = [{'_index': 'products', '_id': 'petzl lynx', '_op_type': 'create', '_routing': 'lynx', 'name': 'lynx', 'brand': 'petzl', 'normalizedName': 'petzl lynx', "imageUrl": "http://image.com", 'relation': {'name': 'origin'}}]
         print(expected_records)
         print(actual_records)
         assert actual_records == expected_records
@@ -162,3 +202,7 @@ class TestUtil(unittest.TestCase):
         print(expected_records[1])
         print(actual_records[1])
         assert expected_records[1] == actual_records[1]
+
+    # def test_find_origin(self):
+    #     origin = find_origin(self.es, PRODUCT_INDEX, "G14", "grivel")
+    #     print(origin)

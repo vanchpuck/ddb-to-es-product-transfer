@@ -27,15 +27,16 @@ def find_origin(es: Elasticsearch, index: str, name: str, brand: str) -> str:
             "query": {
                 "bool": {
                     "must": [
-                        {"match": {"origin": {"query": name}}},
+                        {"match": {"name": {"query": name}}},
                         {"term": {"brand": {"value": brand}}},
+                        {"term": {"relation": {"value": "origin"}}}
                     ]
                 }
             }
         }
     )
     hits = response["hits"]
-    return hits["hits"][0]["_source"]["origin"] if hits["total"]["value"] > 0 else None
+    return hits["hits"][0]["_source"]["name"] if hits["total"]["value"] > 0 else None
 
 
 def process_product(es: Elasticsearch, index: str, product: dict):
@@ -55,7 +56,7 @@ def process_product(es: Elasticsearch, index: str, product: dict):
             '_routing': origin,
             '_op_type': 'create',
             'brand': brand,
-            'origin': origin,
+            'name': origin,
             'normalizedName': get_normalized_name(origin, brand),
             'relation': {'name': 'origin'}}
         logging.info('Origin record: ' + str(es_origin))
@@ -91,7 +92,7 @@ def create_origin_record(index: str, origin: dict):
     image_url = origin['imageUrl']
     normalized_name = get_normalized_name(name, brand)
     return {"_index": index, "_id": normalized_name, '_op_type': 'create', '_routing': name,
-            'name': name, 'normalizedName': normalized_name, 'brand': brand, 'imageUrl': image_url}
+            'name': name, 'normalizedName': normalized_name, 'brand': brand, 'imageUrl': image_url, 'relation': {'name': 'origin'}}
 
 
 def records_generator(es, index, records):
