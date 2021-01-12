@@ -95,14 +95,14 @@ class TestUtil(unittest.TestCase):
 
     def test_find_origin(self):
         self.es.index(index=PRODUCT_INDEX, refresh=True, routing="1", id="grivel G14",
-                      body={"relation": {"name": "origin"}, "name": "G14", "normalizedName": "grivel G14", "brand": "grivel"})
+                      body={"relation": {"name": "origin"}, "name": "G14", "normalizedName": "grivel G14", "brand": "grivel", "isCanonical": True})
         actual_origin = find_origin(self.es, PRODUCT_INDEX, "G14", "grivel")
         print(actual_origin)
         assert actual_origin == "G14"
 
     def test_product_record_with_origin(self):
         self.es.index(index=PRODUCT_INDEX, refresh=True, routing="1", id="lynx",
-                      body={"relation": {"name": "origin"}, "origin": "lynx", "brand": "petzl"})
+                      body={"relation": {"name": "origin"}, "name": "lynx", "brand": "petzl", "isCanonical": True})
         product = {
             "url": "http://lynx.com",
             "name": "petzl lynx crampons",
@@ -114,14 +114,11 @@ class TestUtil(unittest.TestCase):
         }
         actual_records = process_product(self.es, PRODUCT_INDEX, product)
         expected_records = ProductOriginPair(
+            None,
             {
-                '_index': 'products', '_id': 'petzl lynx crampons', '_routing': 'petzl lynx crampons', '_op_type': 'create',
-                'brand': 'petzl', 'name': 'petzl lynx crampons', 'normalizedName': 'petzl lynx crampons', 'relation': {'name': 'origin'}
-            },
-            {
-                '_index': PRODUCT_INDEX, '_id': 'http://lynx.com', '_routing': 'petzl lynx crampons', 'url': 'http://lynx.com',
+                '_index': PRODUCT_INDEX, '_id': 'http://lynx.com', '_routing': 'lynx', 'url': 'http://lynx.com',
                 'store': 'www.store.com', 'name': 'petzl lynx crampons', 'brand': 'petzl', 'price': 99.9, 'currency': 'USD',
-                'imageUrl': 'http://image.com', 'relation': {'name': 'product', 'parent': 'petzl lynx crampons'}
+                'imageUrl': 'http://image.com', 'relation': {'name': 'product', 'parent': 'lynx'}
             }
         )
         print(expected_records)
@@ -141,8 +138,8 @@ class TestUtil(unittest.TestCase):
         }
         actual_records = process_product(self.es, PRODUCT_INDEX, product)
         expected_records = ProductOriginPair({'_index': PRODUCT_INDEX, '_id': name, '_routing': name, '_op_type': 'create',
-                             'brand': 'petzl', 'name': name, 'normalizedName': name,
-                             'relation': {'name': 'origin'}},
+                             'brand': 'petzl', 'name': name, 'normalizedName': name, 'isCanonical': False,
+                             'imageUrl': 'http://image.com', 'relation': {'name': 'origin'}},
                             {'_index': PRODUCT_INDEX, '_id': 'http://lynx.com', '_routing': name, 'url': 'http://lynx.com',
                              'store': 'www.store.com', 'name': name, 'brand': 'petzl',
                              'price': 99.9, 'currency': 'USD',
@@ -158,7 +155,8 @@ class TestUtil(unittest.TestCase):
             ]
         }
         actual_records = process_origin(PRODUCT_INDEX, origin_product)
-        expected_records = [{'_index': 'products', '_id': 'petzl lynx', '_op_type': 'create', '_routing': 'lynx', 'name': 'lynx', 'brand': 'petzl', 'normalizedName': 'petzl lynx', "imageUrl": "http://image.com", 'relation': {'name': 'origin'}}]
+        expected_records = [{'_index': 'products', '_id': 'petzl lynx', '_op_type': 'create', '_routing': 'lynx', 'isCanonical': True,
+                             'name': 'lynx', 'brand': 'petzl', 'normalizedName': 'petzl lynx', "imageUrl": "http://image.com", 'relation': {'name': 'origin'}}]
         print(expected_records)
         print(actual_records)
         assert actual_records == expected_records
