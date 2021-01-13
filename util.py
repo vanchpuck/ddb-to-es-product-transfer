@@ -128,4 +128,5 @@ def records_generator(es, index, records):
 
 
 def get_normalized_name(name: str, brand: str) -> str:
-    return name if brand in name else brand + " " + name
+    normalized_name = name if brand in name else brand + " " + name
+    return normalized_name.lower()
