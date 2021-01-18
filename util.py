@@ -51,15 +51,17 @@ def process_product(es: Elasticsearch, index: str, product: dict):
     if origin is None:
         logging.info('Preparing origin record...')
         origin = name
+        normalized_name = get_normalized_name(origin, brand)
         es_origin = {
             '_index': index,
-            '_id': origin,
+            '_id': normalized_name,
             '_routing': origin,
             '_op_type': 'create',
+            'originId': normalized_name,
             'isCanonical': False,
             'brand': brand,
             'name': origin,
-            'normalizedName': get_normalized_name(origin, brand),
+            'normalizedName': normalized_name,
             'imageUrl': product['imageUrl'],
             'relation': {'name': 'origin'}}
         logging.info('Origin record: ' + str(es_origin))
@@ -94,7 +96,7 @@ def create_origin_record(index: str, origin: dict):
     brand = origin['brand']
     image_url = origin['imageUrl']
     normalized_name = get_normalized_name(name, brand)
-    return {"_index": index, "_id": normalized_name, '_op_type': 'create', '_routing': name, 'isCanonical': True,
+    return {"_index": index, "_id": normalized_name, '_op_type': 'create', '_routing': name, 'isCanonical': True, 'originId': normalized_name,
             'name': name, 'normalizedName': normalized_name, 'brand': brand, 'imageUrl': image_url, 'relation': {'name': 'origin'}}
 
 
