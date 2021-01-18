@@ -42,6 +42,7 @@ def find_origin(es: Elasticsearch, index: str, name: str, brand: str) -> str:
 
 def process_product(es: Elasticsearch, index: str, product: dict):
     origin_dict = None
+    normalized_name = None
     name = product['name']
     brand = product['brand'].lower()
     url = product['url']
@@ -55,7 +56,7 @@ def process_product(es: Elasticsearch, index: str, product: dict):
         es_origin = {
             '_index': index,
             '_id': normalized_name,
-            '_routing': origin,
+            '_routing': normalized_name,
             '_op_type': 'create',
             'originId': normalized_name,
             'isCanonical': False,
@@ -67,10 +68,12 @@ def process_product(es: Elasticsearch, index: str, product: dict):
         logging.info('Origin record: ' + str(es_origin))
         origin_dict = es_origin
     logging.info('Preparing product record...')
+    if not normalized_name:
+        normalized_name = get_normalized_name(origin, brand)
     es_product = {
         "_index": index,
         "_id": url,
-        '_routing': origin,
+        '_routing': normalized_name,
         'url': product['url'],
         'store': product['store'],
         'name': name,
@@ -78,7 +81,7 @@ def process_product(es: Elasticsearch, index: str, product: dict):
         'price': product['price'],
         'currency': product['currency'],
         'imageUrl': product['imageUrl'],
-        'relation': {'name': 'product', 'parent': origin}
+        'relation': {'name': 'product', 'parent': normalized_name}
     }
     if 'oldPrice' in product:
         es_product['oldPrice'] = product['oldPrice']

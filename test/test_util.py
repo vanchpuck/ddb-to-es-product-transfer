@@ -116,9 +116,9 @@ class TestUtil(unittest.TestCase):
         expected_records = ProductOriginPair(
             None,
             {
-                '_index': PRODUCT_INDEX, '_id': 'http://lynx.com', '_routing': 'lynx', 'url': 'http://lynx.com',
+                '_index': PRODUCT_INDEX, '_id': 'http://lynx.com', '_routing': 'petzl lynx', 'url': 'http://lynx.com',
                 'store': 'www.store.com', 'name': 'petzl lynx crampons', 'brand': 'petzl', 'price': 99.9, 'currency': 'USD',
-                'imageUrl': 'http://image.com', 'relation': {'name': 'product', 'parent': 'lynx'}
+                'imageUrl': 'http://image.com', 'relation': {'name': 'product', 'parent': 'petzl lynx'}
             }
         )
         print(expected_records)
@@ -194,8 +194,8 @@ class TestUtil(unittest.TestCase):
                 }
             ]
         }
-        expected_records = [{'_index': 'products', '_id': 'lynx', '_routing': 'lynx', '_op_type': 'create', 'brand': 'petzl', 'origin': 'lynx', 'normalizedName': 'petzl lynx', 'relation': {'name': 'origin'}},
-                            {'_index': 'products', '_id': 'http://test.com/product_1', '_routing': 'lynx', 'url': 'http://test.com/product_1', 'store': 'test_store', 'name': 'lynx', 'brand': 'petzl', 'price': Decimal('10.99'), 'currency': 'USD', 'imageUrl': 'http://test.com/image_1.jpg', 'relation': {'name': 'product', 'parent': 'lynx'}, 'oldPrice': Decimal('12.99')}]
+        expected_records = [{'_index': 'products', '_id': 'lynx', '_routing': 'petzl lynx', '_op_type': 'create', 'brand': 'petzl', 'origin': 'lynx', 'normalizedName': 'petzl lynx', 'relation': {'name': 'origin'}},
+                            {'_index': 'products', '_id': 'http://test.com/product_1', '_routing': 'petzl lynx', 'url': 'http://test.com/product_1', 'store': 'test_store', 'name': 'lynx', 'brand': 'petzl', 'price': Decimal('10.99'), 'currency': 'USD', 'imageUrl': 'http://test.com/image_1.jpg', 'relation': {'name': 'product', 'parent': 'petzl lynx'}, 'oldPrice': Decimal('12.99')}]
         actual_records = (list(records_generator(self.es, PRODUCT_INDEX, event['Records'])))
         print(expected_records[1])
         print(actual_records[1])
