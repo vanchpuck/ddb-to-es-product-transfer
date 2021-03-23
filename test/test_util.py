@@ -3,6 +3,7 @@ from elasticsearch import Elasticsearch
 from time import sleep
 from util import *
 from decimal import *
+import string
 
 
 ELASTIC_HOST = "http://localhost:9200"
@@ -117,7 +118,7 @@ class TestUtil(unittest.TestCase):
             None,
             {
                 '_index': PRODUCT_INDEX, '_id': 'http://lynx.com', '_routing': 'petzl lynx', 'url': 'http://lynx.com',
-                'store': 'www.store.com', 'name': 'petzl lynx crampons', 'brand': 'petzl', 'price': 99.9, 'currency': 'USD',
+                'store': 'www.store.com', 'name': 'Petzl Lynx Crampons', 'brand': 'petzl', 'price': 99.9, 'currency': 'USD',
                 'imageUrl': 'http://image.com', 'relation': {'name': 'product', 'parent': 'petzl lynx'}
             }
         )
@@ -138,10 +139,10 @@ class TestUtil(unittest.TestCase):
         }
         actual_records = process_product(self.es, PRODUCT_INDEX, product)
         expected_records = ProductOriginPair({'_index': PRODUCT_INDEX, '_id': name, '_routing': name, '_op_type': 'create',
-                             'brand': 'petzl', 'name': name, 'normalizedName': name, 'isCanonical': False, 'originId': name,
+                             'brand': 'petzl', 'name': name, 'normalizedName': name.lower(), 'isCanonical': False, 'originId': name,
                              'imageUrl': 'http://image.com', 'relation': {'name': 'origin'}},
                             {'_index': PRODUCT_INDEX, '_id': 'http://lynx.com', '_routing': name, 'url': 'http://lynx.com',
-                             'store': 'www.store.com', 'name': name, 'brand': 'petzl',
+                             'store': 'www.store.com', 'name': string.capwords(name), 'brand': 'petzl',
                              'price': 99.9, 'currency': 'USD',
                              'imageUrl': 'http://image.com', 'relation': {'name': 'product', 'parent': name}})
         print(expected_records)
@@ -195,7 +196,7 @@ class TestUtil(unittest.TestCase):
             ]
         }
         expected_records = [{'_index': 'products', '_id': 'lynx', '_routing': 'petzl lynx', '_op_type': 'create', 'brand': 'petzl', 'origin': 'lynx', 'normalizedName': 'petzl lynx', 'relation': {'name': 'origin'}},
-                            {'_index': 'products', '_id': 'http://test.com/product_1', '_routing': 'petzl lynx', 'url': 'http://test.com/product_1', 'store': 'test_store', 'name': 'lynx', 'brand': 'petzl', 'price': Decimal('10.99'), 'currency': 'USD', 'imageUrl': 'http://test.com/image_1.jpg', 'relation': {'name': 'product', 'parent': 'petzl lynx'}, 'oldPrice': Decimal('12.99')}]
+                            {'_index': 'products', '_id': 'http://test.com/product_1', '_routing': 'petzl lynx', 'url': 'http://test.com/product_1', 'store': 'test_store', 'name': 'Lynx', 'brand': 'petzl', 'price': Decimal('10.99'), 'currency': 'USD', 'imageUrl': 'http://test.com/image_1.jpg', 'relation': {'name': 'product', 'parent': 'petzl lynx'}, 'oldPrice': Decimal('12.99')}]
         actual_records = (list(records_generator(self.es, PRODUCT_INDEX, event['Records'])))
         print(expected_records[1])
         print(actual_records[1])

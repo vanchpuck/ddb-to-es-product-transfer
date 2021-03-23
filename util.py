@@ -6,6 +6,7 @@ from classification import Classifier
 import boto3
 from dataclasses import dataclass
 from brand_normalizer import normalize
+import string
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -44,7 +45,7 @@ def find_origin(es: Elasticsearch, index: str, name: str, brand: str) -> str:
 def process_product(es: Elasticsearch, index: str, product: dict):
     origin_dict = None
     normalized_name = None
-    name = product['name']
+    name = string.capwords(product['name'])
     brand = product['brand'].lower()
     url = product['url']
     logging.info('Searching for the origin...')
