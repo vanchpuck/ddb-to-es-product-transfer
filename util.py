@@ -5,6 +5,7 @@ from elasticsearch import Elasticsearch
 from classification import Classifier
 import boto3
 from dataclasses import dataclass
+from brand_normalizer import normalize
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -60,7 +61,7 @@ def process_product(es: Elasticsearch, index: str, product: dict):
             '_op_type': 'create',
             'originId': normalized_name,
             'isCanonical': False,
-            'brand': brand,
+            'brand': normalize(brand),
             'name': origin,
             'normalizedName': normalized_name,
             'imageUrl': product['imageUrl'],
@@ -77,7 +78,7 @@ def process_product(es: Elasticsearch, index: str, product: dict):
         'url': product['url'],
         'store': product['store'],
         'name': name,
-        'brand': brand,
+        'brand': normalize(brand),
         'price': product['price'],
         'currency': product['currency'],
         'imageUrl': product['imageUrl'],
