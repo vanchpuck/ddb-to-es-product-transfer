@@ -152,12 +152,12 @@ class TestUtil(unittest.TestCase):
     def test_origin_record(self):
         origin_product = {
             "products": [
-                {"name": "lynx", "brand": "petzl", "imageUrl": "http://image.com"}
+                {"name": "LYNX", "brand": "petzl", "imageUrl": "http://image.com"}
             ]
         }
         actual_records = process_origin(PRODUCT_INDEX, origin_product)
-        expected_records = [{'_index': 'products', '_id': 'petzl lynx', '_op_type': 'create', '_routing': 'lynx', 'isCanonical': True, 'originId': 'petzl lynx',
-                             'name': 'lynx', 'brand': 'petzl', 'normalizedName': 'petzl lynx', "imageUrl": "http://image.com", 'relation': {'name': 'origin'}}]
+        expected_records = [{'_index': 'products', '_id': 'petzl lynx', '_op_type': 'create', '_routing': 'Lynx', 'isCanonical': True, 'originId': 'petzl lynx',
+                             'name': 'Lynx', 'brand': 'petzl', 'normalizedName': 'petzl lynx', "imageUrl": "http://image.com", 'relation': {'name': 'origin'}}]
         print(expected_records)
         print(actual_records)
         assert actual_records == expected_records

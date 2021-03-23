@@ -97,8 +97,8 @@ def process_origin(index: str, origin_product: dict):
 
 
 def create_origin_record(index: str, origin: dict):
-    name = origin['name']
-    brand = origin['brand']
+    name = string.capwords(origin['name'])
+    brand = normalize(origin['brand'])
     image_url = origin['imageUrl']
     normalized_name = get_normalized_name(name, brand)
     return {"_index": index, "_id": normalized_name, '_op_type': 'create', '_routing': name, 'isCanonical': True, 'originId': normalized_name,
