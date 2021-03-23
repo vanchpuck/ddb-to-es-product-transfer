@@ -52,7 +52,7 @@ def process_product(es: Elasticsearch, index: str, product: dict):
     logging.info('Product origin: ' + str(origin))
     if origin is None:
         logging.info('Preparing origin record...')
-        origin = name
+        origin = name.lower()
         normalized_name = get_normalized_name(origin, brand)
         es_origin = {
             '_index': index,
