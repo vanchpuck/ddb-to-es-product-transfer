@@ -46,7 +46,7 @@ def process_product(es: Elasticsearch, index: str, product: dict):
     origin_dict = None
     normalized_name = None
     name = string.capwords(product['name'])
-    brand = product['brand'].lower()
+    brand = normalize(product['brand'].lower())
     url = product['url']
     logging.info('Searching for the origin...')
     origin = find_origin(es, index, name, brand)
@@ -62,7 +62,7 @@ def process_product(es: Elasticsearch, index: str, product: dict):
             '_op_type': 'create',
             'originId': normalized_name,
             'isCanonical': False,
-            'brand': normalize(brand),
+            'brand': brand,
             'name': origin,
             'normalizedName': normalized_name,
             'imageUrl': product['imageUrl'],
@@ -79,7 +79,7 @@ def process_product(es: Elasticsearch, index: str, product: dict):
         'url': product['url'],
         'store': product['store'],
         'name': name,
-        'brand': normalize(brand),
+        'brand': brand,
         'price': product['price'],
         'currency': product['currency'],
         'imageUrl': product['imageUrl'],
