@@ -1,2 +1,2 @@
-elasticsearch>=7.7.1
+elasticsearch==7.7.1
 requests-aws4auth
